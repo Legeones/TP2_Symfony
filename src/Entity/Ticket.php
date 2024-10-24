@@ -207,6 +207,7 @@ class Ticket
     public function setAssignedTo(?User $assigned_to): static
     {
         $this->assigned_to = $assigned_to;
+        $this->status = Status::InProgress;
 
         return $this;
     }
