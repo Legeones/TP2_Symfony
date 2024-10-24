@@ -47,9 +47,18 @@ class Ticket
     #[ORM\OneToMany(targetEntity: TicketStatusHistory::class, mappedBy: 'ticket_id')]
     private Collection $ticketStatusHistories;
 
+    #[ORM\ManyToOne(inversedBy: 'assigned_tickets')]
+    private ?User $assigned_to = null;
+
+    #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $resolve_at = null;
+
     public function __construct()
     {
         $this->ticketStatusHistories = new ArrayCollection();
+        $this->created_at = new \DateTimeImmutable();
+        $this->updated_at = new \DateTime();
+        $this->status = Status::Open;
     }
 
     public function getId(): ?int
@@ -100,8 +109,15 @@ class Ticket
 
     public function setDeadline(\DateTimeInterface $deadline): static
     {
+
         $this->deadline = $deadline;
 
+        return $this;
+    }
+
+    public function setDeadlineBasedOnPriority(): static
+    {
+        $this->deadline = (new \DateTimeImmutable())->modify('+' . $this->priority->days() . ' days');
         return $this;
     }
 
@@ -179,6 +195,30 @@ class Ticket
                 $ticketStatusHistory->setTicketId(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getAssignedTo(): ?User
+    {
+        return $this->assigned_to;
+    }
+
+    public function setAssignedTo(?User $assigned_to): static
+    {
+        $this->assigned_to = $assigned_to;
+
+        return $this;
+    }
+
+    public function getResolveAt(): ?\DateTimeImmutable
+    {
+        return $this->resolve_at;
+    }
+
+    public function setResolveAt(\DateTimeImmutable $resolve_at): static
+    {
+        $this->resolve_at = $resolve_at;
 
         return $this;
     }

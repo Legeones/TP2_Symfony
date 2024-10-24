@@ -51,11 +51,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: TicketStatusHistory::class, mappedBy: 'changed_by')]
     private Collection $ticketAssignedTicketHistories;
 
+    /**
+     * @var Collection<int, Ticket>
+     */
+    #[ORM\OneToMany(targetEntity: Ticket::class, mappedBy: 'assigned_to')]
+    private Collection $assigned_tickets;
+
     public function __construct()
     {
         $this->created_at = new \DateTimeImmutable();
         $this->owned_tickets = new ArrayCollection();
         $this->ticketAssignedTicketHistories = new ArrayCollection();
+        $this->assigned_tickets = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -199,6 +206,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($ticketAssignedTicketHistory->getChangedBy() === $this) {
                 $ticketAssignedTicketHistory->setChangedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Ticket>
+     */
+    public function getAssignedTickets(): Collection
+    {
+        return $this->assigned_tickets;
+    }
+
+    public function addAssignedTicket(Ticket $assignedTicket): static
+    {
+        if (!$this->assigned_tickets->contains($assignedTicket)) {
+            $this->assigned_tickets->add($assignedTicket);
+            $assignedTicket->setAssignedTo($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAssignedTicket(Ticket $assignedTicket): static
+    {
+        if ($this->assigned_tickets->removeElement($assignedTicket)) {
+            // set the owning side to null (unless already changed)
+            if ($assignedTicket->getAssignedTo() === $this) {
+                $assignedTicket->setAssignedTo(null);
             }
         }
 

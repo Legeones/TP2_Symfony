@@ -10,7 +10,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_USER')]
 #[Route('/ticket')]
 final class TicketController extends AbstractController
 {
@@ -26,14 +28,16 @@ final class TicketController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $ticket = new Ticket();
+        $ticket->setOwnedby($this->getUser());
         $form = $this->createForm(TicketType::class, $ticket);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $ticket->setDeadlineBasedOnPriority();
             $entityManager->persist($ticket);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_ticket_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_dashboard', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('ticket/new.html.twig', [
@@ -50,6 +54,7 @@ final class TicketController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_SUPPORT')]
     #[Route('/{id}/edit', name: 'app_ticket_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Ticket $ticket, EntityManagerInterface $entityManager): Response
     {
@@ -59,7 +64,7 @@ final class TicketController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_ticket_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_dashboard', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('ticket/edit.html.twig', [
@@ -68,6 +73,7 @@ final class TicketController extends AbstractController
         ]);
     }
 
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/{id}', name: 'app_ticket_delete', methods: ['POST'])]
     public function delete(Request $request, Ticket $ticket, EntityManagerInterface $entityManager): Response
     {
@@ -76,6 +82,17 @@ final class TicketController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('app_ticket_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_dashboard', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/{id}/assign', name: 'app_ticket_assign', methods: ['POST'])]
+    public function assign(Request $request, Ticket $ticket, EntityManagerInterface $entityManager): Response
+    {
+        if ($this->isCsrfTokenValid('assign'.$ticket->getId(), $request->request->get('_token'))) {
+            $ticket->setAssignedTo($this->getUser());
+            $entityManager->flush();
+        }
+
+        return $this->redirectToRoute('app_dashboard', [], Response::HTTP_SEE_OTHER);
     }
 }

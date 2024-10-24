@@ -4,9 +4,9 @@ namespace App\Entity;
 
 enum Priority : string
 {
-    case Low = 'low';
-    case Medium = 'medium';
-    case High = 'high';
+    case Low = 'Low';
+    case Medium = 'Medium';
+    case High = 'High';
 
     public function label(): string
     {
@@ -14,6 +14,15 @@ enum Priority : string
             self::Low => 'Low Priority',
             self::Medium => 'Medium Priority',
             self::High => 'High Priority',
+        };
+    }
+
+    public function days(): int
+    {
+        return match ($this) {
+            self::Low => 30,
+            self::Medium => 15,
+            self::High => 7,
         };
     }
 }
