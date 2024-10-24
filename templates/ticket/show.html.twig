@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ticket{% endblock %}
+
+{% block body %}
+    <h1>Ticket</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ ticket.id }}</td>
+            </tr>
+            <tr>
+                <th>Titre</th>
+                <td>{{ ticket.titre }}</td>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <td>{{ ticket.description }}</td>
+            </tr>
+            <tr>
+                <th>Statut</th>
+                <td>{{ ticket.statut }}</td>
+            </tr>
+            <tr>
+                <th>Date_creation</th>
+                <td>{{ ticket.dateCreation ? ticket.dateCreation|date('Y-m-d') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Date_maximum_reso</th>
+                <td>{{ ticket.dateMaximumReso ? ticket.dateMaximumReso|date('Y-m-d') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Date_resolu</th>
+                <td>{{ ticket.dateResolu ? ticket.dateResolu|date('Y-m-d') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Priorite</th>
+                <td>{{ ticket.priorite }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_ticket_index') }}">back to list</a>
+
+    <a href="{{ path('app_ticket_edit', {'id': ticket.id}) }}">edit</a>
+
+    {{ include('ticket/_delete_form.html.twig') }}
+{% endblock %}
