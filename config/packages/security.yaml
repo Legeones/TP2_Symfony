@@ -24,6 +24,7 @@ security:
             form_login:
                 login_path: app_login
                 check_path: app_login
+                default_target_path: /dashboard
                 enable_csrf: true
             logout:
                 path: app_logout
@@ -41,6 +42,7 @@ security:
     access_control:
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/register, roles: ROLE_ADMIN }
 
 when@test:
     security:
