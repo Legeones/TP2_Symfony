@@ -2,14 +2,12 @@
 
 namespace App\Entity;
 
-use bar\baz\source_with_namespace;
-
 enum Status : string
 {
     case Open = 'open';
     case InProgress = 'in_progress';
-    case Resolved = 'medium';
-    case Closed = 'high';
+    case Resolved = 'resolved';
+    case Closed = 'closed';
 
     public function label(): string
     {
