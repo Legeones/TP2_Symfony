@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
     <head>
         <meta charset="UTF-8">
         <title>{% block title %}Welcome!{% endblock %}</title>
@@ -11,7 +11,21 @@
             {% block importmap %}{{ importmap('app') }}{% endblock %}
         {% endblock %}
     </head>
-    <body>
-        {% block body %}{% endblock %}
+    {% include 'components/header.html.twig' %}
+    <body class="h-100" style="padding-top: 80px">
+        <div class="container-fluid h-100">
+            <div class="row">
+                <!-- Include the sidebar component -->
+                <div class="col-md-3 p-0 h-100">
+                    {% include 'components/sidebar.html.twig' %}
+                </div>
+
+                <!-- Main content -->
+                <div class="col-md-9 h-100">
+                    {% block body %}{% endblock %}
+                </div>
+            </div>
+        </div>
     </body>
+    {% include 'components/footer.html.twig' %}
 </html>
