@@ -13,7 +13,7 @@
             </tr>
             <tr>
                 <th>Titre</th>
-                <td>{{ ticket.titre }}</td>
+                <td>{{ ticket.title }}</td>
             </tr>
             <tr>
                 <th>Description</th>
@@ -21,29 +21,40 @@
             </tr>
             <tr>
                 <th>Statut</th>
-                <td>{{ ticket.statut }}</td>
+                <td>{{ ticket.status ? ticket.status.label() : '' }}</td>
             </tr>
             <tr>
                 <th>Date_creation</th>
-                <td>{{ ticket.dateCreation ? ticket.dateCreation|date('Y-m-d') : '' }}</td>
+                <td>{{ ticket.createdat ? ticket.createdat|date('Y-m-d') : '' }}</td>
             </tr>
             <tr>
                 <th>Date_maximum_reso</th>
-                <td>{{ ticket.dateMaximumReso ? ticket.dateMaximumReso|date('Y-m-d') : '' }}</td>
+                <td>{{ ticket.deadline ? ticket.deadline|date('Y-m-d') : '' }}</td>
             </tr>
             <tr>
                 <th>Date_resolu</th>
-                <td>{{ ticket.dateResolu ? ticket.dateResolu|date('Y-m-d') : '' }}</td>
+                <td>{{ ticket.resolveAt ? ticket.resolveAt|date('Y-m-d') : '' }}</td>
             </tr>
             <tr>
                 <th>Priorite</th>
-                <td>{{ ticket.priorite }}</td>
+                <td>{{ ticket.priority ? ticket.priority.label() : '' }}</td>
             </tr>
+            <tr>
+                <th>Affecté</th>
+                <td>{{ ticket.assignedTo ? ticket.assignedTo.email : 'Nobody' }}</td>
+            </tr>
+
         </tbody>
     </table>
 
-    <a href="{{ path('app_ticket_index') }}">back to list</a>
+    <a href="{{ path('app_dashboard') }}">back to list</a>
 
+    {% if is_granted('ROLE_SUPPORT') %}
+        <form action="{{ path('app_ticket_assign', {'id': ticket.id}) }}" method="post">
+            <input type="hidden" name="_token" value="{{ csrf_token('assign' ~ ticket.id) }}">
+            <button type="submit">Assign</button>
+        </form>
+    {% endif %}
     <a href="{{ path('app_ticket_edit', {'id': ticket.id}) }}">edit</a>
 
     {{ include('ticket/_delete_form.html.twig') }}
