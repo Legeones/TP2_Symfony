@@ -2,8 +2,12 @@
 
 namespace App\Form;
 
+use App\Entity\Priority;
 use App\Entity\Ticket;
+use App\Entity\User;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -12,20 +16,14 @@ class TicketType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('titre')
-            ->add('description')
-            ->add('statut')
-            ->add('date_creation', null, [
-                'widget' => 'single_text',
+            ->add('title')
+            ->add('priority', ChoiceType::class, [
+                'choices' => array_combine(
+                    array_map(fn(Priority $priority) => $priority->label(), Priority::cases()),
+                    Priority::cases()
+                ),
             ])
-            ->add('date_maximum_reso', null, [
-                'widget' => 'single_text',
-            ])
-            ->add('date_resolu', null, [
-                'widget' => 'single_text',
-            ])
-            ->add('priorite')
-        ;
+            ->add('description');
     }
 
     public function configureOptions(OptionsResolver $resolver): void

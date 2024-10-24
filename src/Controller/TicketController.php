@@ -26,10 +26,12 @@ final class TicketController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $ticket = new Ticket();
+        $ticket->setOwnedby($this->getUser());
         $form = $this->createForm(TicketType::class, $ticket);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $ticket->setDeadlineBasedOnPriority();
             $entityManager->persist($ticket);
             $entityManager->flush();
 
