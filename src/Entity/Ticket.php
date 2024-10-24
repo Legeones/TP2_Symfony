@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\TicketRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -17,10 +19,10 @@ class Ticket
     #[ORM\Column(length: 255)]
     private ?string $title = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
     private ?\DateTimeInterface $created_at = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
     private ?\DateTimeInterface $deadline = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
@@ -34,6 +36,21 @@ class Ticket
 
     #[ORM\Column(type: Types::TEXT)]
     private ?string $description = null;
+
+    #[ORM\ManyToOne(inversedBy: 'owned_tickets')]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?User $owned_by = null;
+
+    /**
+     * @var Collection<int, TicketStatusHistory>
+     */
+    #[ORM\OneToMany(targetEntity: TicketStatusHistory::class, mappedBy: 'ticket_id')]
+    private Collection $ticketStatusHistories;
+
+    public function __construct()
+    {
+        $this->ticketStatusHistories = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -120,6 +137,48 @@ class Ticket
     public function setStatus(Status $status): static
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getOwnedby(): ?User
+    {
+        return $this->owned_by;
+    }
+
+    public function setOwnedby(?User $owned_by): static
+    {
+        $this->owned_by = $owned_by;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, TicketStatusHistory>
+     */
+    public function getTicketStatusHistories(): Collection
+    {
+        return $this->ticketStatusHistories;
+    }
+
+    public function addTicketStatusHistory(TicketStatusHistory $ticketStatusHistory): static
+    {
+        if (!$this->ticketStatusHistories->contains($ticketStatusHistory)) {
+            $this->ticketStatusHistories->add($ticketStatusHistory);
+            $ticketStatusHistory->setTicketId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTicketStatusHistory(TicketStatusHistory $ticketStatusHistory): static
+    {
+        if ($this->ticketStatusHistories->removeElement($ticketStatusHistory)) {
+            // set the owning side to null (unless already changed)
+            if ($ticketStatusHistory->getTicketId() === $this) {
+                $ticketStatusHistory->setTicketId(null);
+            }
+        }
 
         return $this;
     }
