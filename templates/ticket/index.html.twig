@@ -11,11 +11,12 @@
                 <th>Id</th>
                 <th>Titre</th>
                 <th>Description</th>
+                <th>Priorite</th>
                 <th>Statut</th>
+                <th>Affecté</th>
                 <th>Date_creation</th>
                 <th>Date_maximum_reso</th>
                 <th>Date_resolu</th>
-                <th>Priorite</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -23,16 +24,18 @@
         {% for ticket in tickets %}
             <tr>
                 <td>{{ ticket.id }}</td>
-                <td>{{ ticket.titre }}</td>
+                <td>{{ ticket.title }}</td>
                 <td>{{ ticket.description }}</td>
-                <td>{{ ticket.statut }}</td>
-                <td>{{ ticket.dateCreation ? ticket.dateCreation|date('Y-m-d') : '' }}</td>
-                <td>{{ ticket.dateMaximumReso ? ticket.dateMaximumReso|date('Y-m-d') : '' }}</td>
-                <td>{{ ticket.dateResolu ? ticket.dateResolu|date('Y-m-d') : '' }}</td>
-                <td>{{ ticket.priorite }}</td>
+                <td>{{ ticket.priority ? ticket.priority.label() : '' }}</td>
+                <td>{{ ticket.status ? ticket.status.label() : '' }}</td>
+                <td>{{ ticket.assignedTo ? ticket.assignedTo.email : '' }}</td>
+                <td>{{ ticket.createdat ? ticket.createdat|date('Y-m-d') : '' }}</td>
+                <td>{{ ticket.deadline ? ticket.deadline|date('Y-m-d') : '' }}</td>
+                <td>{{ ticket.resolveAt ? ticket.resolveAt|date('Y-m-d') : '' }}</td>
                 <td>
                     <a href="{{ path('app_ticket_show', {'id': ticket.id}) }}">show</a>
                     <a href="{{ path('app_ticket_edit', {'id': ticket.id}) }}">edit</a>
+                    <a href="{{ path('app_ticket_assign', {'id': ticket.id}) }}">assign</a>
                 </td>
             </tr>
         {% else %}

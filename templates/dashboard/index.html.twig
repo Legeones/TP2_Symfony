@@ -3,10 +3,19 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+    <style>
+        .example-wrapper {
+            margin: 1em auto;
+            max-width: 800px;
+            width: 95%;
+            font: 18px/1.5 sans-serif;
+        }
+
+        .example-wrapper code {
+            background: #F5F5F5;
+            padding: 2px 6px;
+        }
+    </style>
 
     <table class="table">
         <thead>
@@ -14,11 +23,12 @@
             <th>Id</th>
             <th>Titre</th>
             <th>Description</th>
+            <th>Priorite</th>
             <th>Statut</th>
+            <th>Affecté</th>
             <th>Date_creation</th>
             <th>Date_maximum_reso</th>
             <th>Date_resolu</th>
-            <th>Priorite</th>
             <th>actions</th>
         </tr>
         </thead>
@@ -26,16 +36,26 @@
         {% for ticket in tickets %}
             <tr>
                 <td>{{ ticket.id }}</td>
-                <td>{{ ticket.titre }}</td>
+                <td>{{ ticket.title }}</td>
                 <td>{{ ticket.description }}</td>
-                <td>{{ ticket.statut }}</td>
-                <td>{{ ticket.dateCreation ? ticket.dateCreation|date('Y-m-d') : '' }}</td>
-                <td>{{ ticket.dateMaximumReso ? ticket.dateMaximumReso|date('Y-m-d') : '' }}</td>
-                <td>{{ ticket.dateResolu ? ticket.dateResolu|date('Y-m-d') : '' }}</td>
-                <td>{{ ticket.priorite }}</td>
+                <td>{{ ticket.priority ? ticket.priority.label() : '' }}</td>
+                <td>{{ ticket.status ? ticket.status.label() : '' }}</td>
+                <td>{{ ticket.assignedTo ? ticket.assignedTo.email : '' }}</td>
+                <td>{{ ticket.createdat ? ticket.createdat|date('Y-m-d') : '' }}</td>
+                <td>{{ ticket.deadline ? ticket.deadline|date('Y-m-d') : '' }}</td>
+                <td>{{ ticket.resolveAt ? ticket.resolveAt|date('Y-m-d') : '' }}</td>
                 <td>
                     <a href="{{ path('app_ticket_show', {'id': ticket.id}) }}">show</a>
-                    <a href="{{ path('app_ticket_edit', {'id': ticket.id}) }}">edit</a>
+                    {% if is_granted('ROLE_SUPPORT') %}
+                        <a href="{{ path('app_ticket_edit', {'id': ticket.id}) }}">edit</a>
+                        {% if ticket.assignedTo is null %}
+                            <form action="{{ path('app_ticket_assign', {'id': ticket.id}) }}" method="post">
+                                <input type="hidden" name="_token" value="{{ csrf_token('assign' ~ ticket.id) }}">
+                                <button type="submit">Assign</button>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+
                 </td>
             </tr>
         {% else %}
@@ -45,4 +65,5 @@
         {% endfor %}
         </tbody>
     </table>
+    <a href="{{ path('app_ticket_new') }}">Create new</a>
 {% endblock %}
