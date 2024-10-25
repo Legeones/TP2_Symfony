@@ -19,3 +19,5 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
+
+    Symfony\Component\Console\Application: '@console.messenger.application'
