@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Status;
 use App\Entity\Ticket;
 use App\Form\TicketType;
 use App\Repository\TicketRepository;
@@ -93,6 +94,17 @@ final class TicketController extends AbstractController
             $entityManager->flush();
         }
 
+        return $this->redirectToRoute('app_dashboard', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/{id}/resolve', name: 'app_ticket_resolve', methods: ['POST'])]
+    public function resolve(Request $request, Ticket $ticket, EntityManagerInterface $entityManager): Response
+    {
+        if ($this->isCsrfTokenValid('resolve'.$ticket->getId(), $request->request->get('_token'))) {
+            $ticket->setStatus(Status::Resolved);
+            $ticket->setResolveAt(new \DateTimeImmutable());
+            $entityManager->flush();
+        }
         return $this->redirectToRoute('app_dashboard', [], Response::HTTP_SEE_OTHER);
     }
 }

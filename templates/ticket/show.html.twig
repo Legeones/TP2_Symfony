@@ -51,11 +51,19 @@
     <a class="btn btn-primary m-1" href="{{ path('app_dashboard') }}">back to list</a>
 
     {% if is_granted('ROLE_SUPPORT') %}
-        <a href="{{ path('app_ticket_edit', {'id': ticket.id}) }}">edit</a>
-        <form action="{{ path('app_ticket_assign', {'id': ticket.id}) }}" method="post">
-            <input type="hidden" name="_token" value="{{ csrf_token('assign' ~ ticket.id) }}">
-            <button class="btn btn-primary" type="submit">Assign</button>
-        </form>
+        {% if ticket.assignedTo.email == app.user.email %}
+            <a href="{{ path('app_ticket_edit', {'id': ticket.id}) }}">edit</a>
+            <form action="{{ path('app_ticket_resolve', {'id': ticket.id}) }}" method="post">
+                <input type="hidden" name="_token" value="{{ csrf_token('resolve' ~ ticket.id) }}">
+                <button type="submit">Resolve</button>
+            </form>
+        {% endif %}
+        {% if ticket.assignedTo is null %}
+            <form action="{{ path('app_ticket_assign', {'id': ticket.id}) }}" method="post">
+                <input type="hidden" name="_token" value="{{ csrf_token('assign' ~ ticket.id) }}">
+                <button type="submit">Assign</button>
+            </form>
+        {% endif %}
     {% endif %}
 
 
