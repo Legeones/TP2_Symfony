@@ -43,7 +43,7 @@ class TicketRepository extends ServiceEntityRepository
             ->select("ticket.created_at, COUNT(ticket.id) as nbTicket")
             ->groupBy('ticket.created_at')
             ->where('ticket.created_at >= :year')
-            ->setParameter('year', date('Y'))
+            ->setParameter('year', date('Y-M-01', strtotime('-1 year')))
             ->getQuery()
             ->getArrayResult();
 

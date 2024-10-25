@@ -1,12 +1,25 @@
 <!-- templates/components/sidebar.html.twig -->
-<div class="sidebar d-flex flex-column flex-shrink-0 bg-light w-100 p-2" style="height:calc(100vh - 120px)" >
+<div class="sidebar d-flex flex-column flex-shrink-0 bg-light w-100 p-2" style="height:calc(100vh - 80px)" >
     <ul class="nav nav-pills flex-column mb-auto">
         <li class="nav-item">
-            <a href="{{ path('app_dashboard') }}" class="nav-link active" aria-current="page">
+            <a href="{{ path('app_dashboard') }}"
+               class="nav-link {% if app.request.attributes.get('_route') == 'app_dashboard' %}active{% endif %}"
+               aria-current="page">
                 Dashboard
             </a>
+            {% if app.request.attributes.get('_route') == 'app_dashboard' %}
+                <div class="p-lg-2">
+                    <a href="#headingOne" class="nav-link border-bottom">
+                        Table Tickets
+                    </a>
+                    <a href="#headingTwo" class="nav-link border-bottom">
+                        Statistics Tickets
+                    </a>
+                </div>
+            {% endif %}
             {% if is_granted('ROLE_ADMIN') %}
-                <a href="{{ path('app_user_index') }}" class="nav-link">
+                <a href="{{ path('app_user_index') }}"
+                   class="nav-link {% if app.request.attributes.get('_route') == 'app_user_index' %}active{% endif %}">
                     Gestion utilisateurs
                 </a>
             {% endif %}
@@ -15,7 +28,8 @@
     <hr>
     <div>
         <a href="#" class="d-flex align-items-center text-decoration-none">
-            <strong>User</strong>
+            <strong>{{ app.user.email }}</strong>
+            <a href="logout">Logout</a>
         </a>
     </div>
 </div>

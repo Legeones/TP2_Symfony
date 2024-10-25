@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Form\TicketFilterType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Repository\TicketRepository;
@@ -12,7 +14,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class DashboardController extends AbstractController
 {
     #[Route('/dashboard', name: 'app_dashboard')]
-    public function index(TicketRepository $ticketRepository): Response
+    public function index(Request $request, TicketRepository $ticketRepository): Response
     {
         $dataStatusCount = $ticketRepository->ticketByStatusCount();
         $dataExpiredTickets = $ticketRepository->ticketByDateOverpassedCount();
@@ -44,8 +46,40 @@ class DashboardController extends AbstractController
             $valuesTicketsByMonth[] = $row['nbTicket'];
         }
 
+        $form = $this->createForm(TicketFilterType::class);
+        $form->handleRequest($request);
+
+        // Default query to retrieve all tickets
+        $queryBuilder = $ticketRepository->createQueryBuilder('t');
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+
+            // Filter by title
+            if (!empty($data['title'])) {
+                $queryBuilder->andWhere('t.title LIKE :title')
+                    ->setParameter('title', '%' . $data['title'] . '%');
+            }
+
+            // Filter by priority
+            if (!empty($data['priority'])) {
+                $queryBuilder->andWhere('t.priority = :priority')
+                    ->setParameter('priority', $data['priority']);
+            }
+
+            // Filter by status
+            if (!empty($data['status'])) {
+                $queryBuilder->andWhere('t.status = :status')
+                    ->setParameter('status', $data['status']);
+            }
+        }
+
+        // Execute the query and get the results
+        $tickets = $queryBuilder->getQuery()->getResult();
+
         return $this->render('dashboard/index.html.twig', [
-            'tickets' => $ticketRepository->findAll(),
+            'tickets' => $tickets,
+            'form' => $form->createView(),
             'controller_name' => 'DashboardController',
             'chartStatusCountLabels' => $labelsStatusCount,
             'chartStatusCountValues' => $valuesStatusCount,
