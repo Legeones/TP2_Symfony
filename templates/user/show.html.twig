@@ -17,7 +17,7 @@
             </tr>
             <tr>
                 <th>Roles</th>
-                <td>{{ user.roles ? user.roles|json_encode : '' }}</td>
+                <td>{{ user.getMainRole() ? user.getMainRole() : '' }}</td>
             </tr>
             <tr>
                 <th>Password</th>

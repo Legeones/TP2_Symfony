@@ -109,11 +109,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @param list<string> $roles
      */
-    public function setRoles(array $roles): static
+    public function setRoles(array|string|Roles $roles): static
     {
+        if ($roles instanceof Roles) {
+            $roles = $roles->value;
+        }
+        if (is_string($roles)) {
+            $roles = [$roles];
+        }
         $this->roles = $roles;
 
         return $this;
+    }
+
+    public function getMainRole(): string
+    {
+        $roles = $this->getRoles();
+
+        if (in_array('ROLE_ADMIN', $roles)) {
+            return 'ROLE_ADMIN';
+        } elseif (in_array('ROLE_SUPPORT', $roles)) {
+            return 'ROLE_SUPPORT';
+        }
+
+        return 'ROLE_USER';
     }
 
     /**

@@ -48,6 +48,7 @@ class Ticket
     private Collection $ticketStatusHistories;
 
     #[ORM\ManyToOne(inversedBy: 'assigned_tickets')]
+    #[ORM\JoinColumn(nullable: true)]
     private ?User $assigned_to = null;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
