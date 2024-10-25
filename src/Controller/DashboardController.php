@@ -14,27 +14,45 @@ class DashboardController extends AbstractController
     #[Route('/dashboard', name: 'app_dashboard')]
     public function index(TicketRepository $ticketRepository): Response
     {
-        $data = $ticketRepository->pieChartData();
+        $dataStatusCount = $ticketRepository->ticketByStatusCount();
+        $dataExpiredTickets = $ticketRepository->ticketByDateOverpassedCount();
+        $dataTicketsByMonth = $ticketRepository->ticketCreatedByMonthCount();
+
 
         // Prepare labels and values for the chart
-        $labels = [];
-        $values = [];
+        $labelsStatusCount = [];
+        $valuesStatusCount = [];
 
-        foreach ($data as $row) {
-            $labels[] = $row['status']->name;       // Use the status as label
-            $values[] = $row['nbTicket'];     // Use the count as data
+        $labelsExpiredTickets = [];
+        $valuesExpiredTickets = [];
+
+        $labelsTicketsByMonth = [];
+        $valuesTicketsByMonth = [];
+
+        foreach ($dataStatusCount as $row) {
+            $labelsStatusCount[] = $row['status']->name;       // Use the status as label
+            $valuesStatusCount[] = $row['nbTicket'];     // Use the count as data
         }
 
-        $data = [
-            'chartLabels' => $labels,
-            'chartValues' => $values,
-        ];
+        foreach ($dataExpiredTickets as $row) {
+            $labelsExpiredTickets[] = $row['priority'];
+            $valuesExpiredTickets[] = $row['nbTicket'];
+        }
+
+        foreach ($dataTicketsByMonth as $row) {
+            $labelsTicketsByMonth[] = $row['monthYear'];
+            $valuesTicketsByMonth[] = $row['nbTicket'];
+        }
 
         return $this->render('dashboard/index.html.twig', [
             'tickets' => $ticketRepository->findAll(),
             'controller_name' => 'DashboardController',
-            'chartLabels' => $data['chartLabels'],
-            'chartValues' => $data['chartValues'],
+            'chartStatusCountLabels' => $labelsStatusCount,
+            'chartStatusCountValues' => $valuesStatusCount,
+            'chartExpiredTicketsLabels' => $labelsExpiredTickets,
+            'chartExpiredTicketValues' => $valuesExpiredTickets,
+            'chartTicketsByMonthLabels' => $labelsTicketsByMonth,
+            'chartTicketsByMonthValues' => $valuesTicketsByMonth,
         ]);
     }
 

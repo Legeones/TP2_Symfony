@@ -4,6 +4,12 @@
         <meta charset="UTF-8">
         <title>{% block title %}Gestion de Tickets{% endblock %}</title>
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+
+        <!-- Collapse -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
         {% block stylesheets %}
             {{ encore_entry_link_tags('app') }}
         {% endblock %}
@@ -18,12 +24,12 @@
         <div class="container-fluid h-100">
             <div class="row">
                 <!-- Include the sidebar component -->
-                <div class="col-md-2 p-0 h-100">
+                <div class="col-md-2 p-0 h-100 d-flex">
                     {% include 'components/sidebar.html.twig' %}
                 </div>
 
                 <!-- Main content -->
-                <div class="col-md-10 h-100">
+                <div class="col-md-10 overflow-y-auto" style="height: calc(100vh - 120px)">
                     {% block body %}{% endblock %}
                 </div>
             </div>
