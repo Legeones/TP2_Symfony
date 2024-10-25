@@ -105,7 +105,6 @@ final class TicketController extends AbstractController
             $ticket->setResolveAt(new \DateTimeImmutable());
             $entityManager->flush();
         }
-
         return $this->redirectToRoute('app_dashboard', [], Response::HTTP_SEE_OTHER);
     }
 }
