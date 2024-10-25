@@ -16,6 +16,14 @@ class TicketRepository extends ServiceEntityRepository
         parent::__construct($registry, Ticket::class);
     }
 
+    public function pieChartData(){
+        return $this->createQueryBuilder('ticket')
+            ->select("ticket.status, COUNT(ticket.id) as nbTicket")
+            ->groupBy('ticket.status')
+            ->getQuery()
+            ->getArrayResult();
+    }
+
     //    /**
     //     * @return Ticket[] Returns an array of Ticket objects
     //     */

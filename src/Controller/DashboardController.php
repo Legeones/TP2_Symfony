@@ -14,9 +14,27 @@ class DashboardController extends AbstractController
     #[Route('/dashboard', name: 'app_dashboard')]
     public function index(TicketRepository $ticketRepository): Response
     {
+        $data = $ticketRepository->pieChartData();
+
+        // Prepare labels and values for the chart
+        $labels = [];
+        $values = [];
+
+        foreach ($data as $row) {
+            $labels[] = $row['status']->name;       // Use the status as label
+            $values[] = $row['nbTicket'];     // Use the count as data
+        }
+
+        $data = [
+            'chartLabels' => $labels,
+            'chartValues' => $values,
+        ];
+
         return $this->render('dashboard/index.html.twig', [
             'tickets' => $ticketRepository->findAll(),
             'controller_name' => 'DashboardController',
+            'chartLabels' => $data['chartLabels'],
+            'chartValues' => $data['chartValues'],
         ]);
     }
 
