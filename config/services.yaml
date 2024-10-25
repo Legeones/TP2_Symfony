@@ -19,8 +19,3 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
-
-    App\EventListener\TicketListener:
-        tags:
-            - { name: doctrine.event_listener, event: postUpdate, method: updateHistorique }
-
