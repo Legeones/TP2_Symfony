@@ -66,6 +66,13 @@ class TicketRepository extends ServiceEntityRepository
         }, $monthCounts, array_keys($monthCounts));
     }
 
+    public function findTicketByUser($user)
+    {
+        return $this->createQueryBuilder('ticket')
+            ->where('ticket.owned_by = :user')
+            ->setParameter('user', $user);
+    }
+
     //    /**
     //     * @return Ticket[] Returns an array of Ticket objects
     //     */

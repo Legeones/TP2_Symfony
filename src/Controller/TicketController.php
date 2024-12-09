@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Status;
 use App\Entity\Ticket;
+use App\Form\TicketFilterType;
 use App\Form\TicketType;
 use App\Repository\TicketRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,11 +18,43 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/ticket')]
 final class TicketController extends AbstractController
 {
-    #[Route(name: 'app_ticket_index', methods: ['GET'])]
-    public function index(TicketRepository $ticketRepository): Response
+    #[Route('/mine', name: 'app_ticket_user', methods: ['GET'])]
+    public function index(Request $request, TicketRepository $ticketRepository): Response
     {
+        $form = $this->createForm(TicketFilterType::class);
+        $form->handleRequest($request);
+
+        // Default query to retrieve tickets owned by the user
+        $queryBuilder = $ticketRepository->findTicketByUser($this->getUser());
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+
+            // Filter by title
+            if (!empty($data['title'])) {
+                $queryBuilder->andWhere('ticket.title LIKE :title')
+                    ->setParameter('title', '%' . $data['title'] . '%');
+            }
+
+            // Filter by priority
+            if (!empty($data['priority'])) {
+                $queryBuilder->andWhere('ticket.priority = :priority')
+                    ->setParameter('priority', $data['priority']);
+            }
+
+            // Filter by status
+            if (!empty($data['status'])) {
+                $queryBuilder->andWhere('ticket.status = :status')
+                    ->setParameter('status', $data['status']);
+            }
+        }
+
+        $tickets = $queryBuilder->getQuery()->getResult();
+
         return $this->render('ticket/index.html.twig', [
-            'tickets' => $ticketRepository->findAll(),
+            'tickets' => $tickets,
+            'form' => $form->createView(),
+            'controller_name' => 'TicketController',
         ]);
     }
 
