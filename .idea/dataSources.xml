@@ -8,7 +8,7 @@
       <jdbc-url>jdbc:postgresql://localhost:5432/app</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="data" uuid="3d6f9e58-d8d9-4ada-ab2c-eded066732cb">
+    <data-source source="LOCAL" name="data" uuid="f31ab7c1-0e1e-4999-85cf-b431ba4cee9b">
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>

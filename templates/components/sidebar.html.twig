@@ -13,9 +13,11 @@
                 <a href="#headingOne" class="nav-link border-bottom">
                     Table Tickets
                 </a>
+                {% if is_granted('ROLE_SUPPORT') %}
                 <a href="#headingTwo" class="nav-link border-bottom">
                     Statistics Tickets
                 </a>
+                {% endif %}
             </div>
             {% endif %}
             {% if is_granted('ROLE_ADMIN') %}
@@ -27,6 +29,10 @@
             <a href="{{ path('app_ticket_user') }}" class="nav-link {% if app.request.attributes.get('_route') == 'app_ticket_user' %}active{% endif %}">
                 Mes Tickets
             </a>
+            <a href="{{ path('app_ticket_new') }}" class="nav-link {% if app.request.attributes.get('_route') == 'app_ticket_new' %}active{% endif %}">
+                Créer un Ticket
+            </a>
+
         </li>
     </ul>
     <hr>

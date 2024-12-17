@@ -4,8 +4,9 @@ security:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
 
     role_hierarchy:
-        ROLE_ADMIN: [ROLE_USER, ROLE_SUPPORT]
-        ROLE_SUPPORT: [ROLE_USER]
+        ROLE_USER: [ROLE_USER]
+        ROLE_ADMIN: [ROLE_ADMIN]
+        ROLE_SUPPORT: [ROLE_SUPPORT]
 
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
@@ -24,7 +25,7 @@ security:
             form_login:
                 login_path: app_login
                 check_path: app_login
-                default_target_path: /dashboard
+                default_target_path: /
                 enable_csrf: true
             logout:
                 path: app_logout

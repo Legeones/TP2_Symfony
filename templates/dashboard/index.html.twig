@@ -14,7 +14,7 @@
                 </h5>
             </div>
             <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
-                <div class="card-body">
+                <div class="card-body overflow-x-auto">
                     {{ form_start(form, {'attr': {'class': 'mb-3'}}) }}
                     <div class="row">
                         <div class="col-3">{{ form_row(form.title) }}</div>
@@ -98,6 +98,7 @@
                 </div>
             </div>
         </div>
+        {% if is_granted('ROLE_SUPPORT') %}
         <div class="card">
             <div class="card-header" id="headingTwo">
                 <h5 class="mb-0">
@@ -108,7 +109,7 @@
             </div>
             <div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo" data-parent="#accordion">
                 <div class="card-body">
-                    <h2>Your Charts Here</h2>
+                    <h2>Statistics</h2>
                     <div class="row">
                         <div class="col-5">
                             <canvas style="max-height: 300px" id="statusCountChart"></canvas>
@@ -122,7 +123,6 @@
             </div>
         </div>
     </div>
-
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
@@ -161,6 +161,14 @@
                             borderWidth: 1
                         }]
                     },
+                    options: {
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: label
+                            }
+                        }
+                    }
                 });
             }
 
@@ -183,4 +191,5 @@
             }
         });
     </script>
+        {% endif %}
 {% endblock %}
