@@ -20,7 +20,6 @@ class DashboardController extends AbstractController
         $dataExpiredTickets = $ticketRepository->ticketByDateOverpassedCount();
         $dataTicketsByMonth = $ticketRepository->ticketCreatedByMonthCount();
 
-
         // Prepare labels and values for the chart
         $labelsStatusCount = [];
         $valuesStatusCount = [];
@@ -51,6 +50,12 @@ class DashboardController extends AbstractController
 
         // Default query to retrieve all tickets
         $queryBuilder = $ticketRepository->createQueryBuilder('t');
+
+        // Filter tickets based on user role
+        if (!$this->isGranted('ROLE_SUPPORT')) {
+            $queryBuilder->andWhere('t.owned_by = :user')
+                ->setParameter('user', $this->getUser());
+        }
 
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
@@ -89,6 +94,4 @@ class DashboardController extends AbstractController
             'chartTicketsByMonthValues' => $valuesTicketsByMonth,
         ]);
     }
-
-
 }
