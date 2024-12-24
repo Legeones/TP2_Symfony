@@ -7,5 +7,5 @@
 
     {{ include('ticket/_form.html.twig') }}
 
-    <a href="{{ path('app_ticket_user') }}">back to list</a>
+    <button onclick="location.href='{{ path('app_ticket_user') }}'" class="btn btn-secondary">Back to list</button>
 {% endblock %}

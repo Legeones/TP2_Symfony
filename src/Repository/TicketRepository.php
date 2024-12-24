@@ -5,6 +5,8 @@ namespace App\Repository;
 use App\Entity\Ticket;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Form\Form;
+use App\Entity\User;
 
 /**
  * @extends ServiceEntityRepository<Ticket>
@@ -73,28 +75,84 @@ class TicketRepository extends ServiceEntityRepository
             ->setParameter('user', $user);
     }
 
-    //    /**
-    //     * @return Ticket[] Returns an array of Ticket objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('t')
-    //            ->andWhere('t.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('t.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function filterTickets(Form $form): array
+    {
+        $queryBuilder = $this->createQueryBuilder('t');
 
-    //    public function findOneBySomeField($value): ?Ticket
-    //    {
-    //        return $this->createQueryBuilder('t')
-    //            ->andWhere('t.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        if ($form->isSubmitted() && $form->isValid()) {
+            $title = $form->get('title')->getData();
+            $priority = $form->get('priority')->getData();
+            $status = $form->get('status')->getData();
+            $createdat = $form->get('createdat')->getData();
+
+
+            if ($title) {
+                $queryBuilder->andWhere('t.title LIKE :title')
+                    ->setParameter('title', '%' . $title . '%');
+            }
+            if ($priority) {
+                $queryBuilder->andWhere('t.priority = :priority')
+                    ->setParameter('priority', $priority);
+            }
+            if ($status) {
+                $queryBuilder->andWhere('t.status = :status')
+                    ->setParameter('status', $status);
+            }
+            if ($createdat) {
+                $formattedDate = $createdat->format('Y-m-d');
+                $queryBuilder->andWhere('t.created_at = :createdat')
+                    ->setParameter('createdat', $formattedDate);
+            }
+        }
+        return $queryBuilder
+            ->orderBy('t.created_at', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function filterMyTickets(Form $form, User $user): array
+    {
+        $queryBuilder = $this->createQueryBuilder('t')
+            ->where('t.assignedTo = :user')
+            ->setParameter('user', $user);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $title = $form->get('title')->getData();
+            $priority = $form->get('priority')->getData();
+            $status = $form->get('status')->getData();
+            $createdat = $form->get('createdat')->getData();
+
+
+            if ($title) {
+                $queryBuilder->andWhere('t.title LIKE :title')
+                    ->setParameter('title', '%' . $title . '%');
+            }
+            if ($priority) {
+                $queryBuilder->andWhere('t.priority = :priority')
+                    ->setParameter('priority', $priority);
+            }
+            if ($status) {
+                $queryBuilder->andWhere('t.status = :status')
+                    ->setParameter('status', $status);
+            }
+            if ($createdat) {
+                $formattedDate = $createdat->format('Y-m-d');
+                $queryBuilder->andWhere('t.created_at = :createdat')
+                    ->setParameter('createdat', $formattedDate);
+            }
+        }
+        return $queryBuilder
+            ->orderBy('t.created_at', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+
+    public function getTotalNumberOfTickets(): int
+    {
+        return $this->createQueryBuilder('t')
+            ->select('count(t.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

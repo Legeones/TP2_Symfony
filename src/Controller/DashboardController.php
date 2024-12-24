@@ -3,11 +3,11 @@
 namespace App\Controller;
 
 use App\Form\TicketFilterType;
+use App\Repository\TicketRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
-use App\Repository\TicketRepository;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_USER')]
@@ -19,6 +19,7 @@ class DashboardController extends AbstractController
         $dataStatusCount = $ticketRepository->ticketByStatusCount();
         $dataExpiredTickets = $ticketRepository->ticketByDateOverpassedCount();
         $dataTicketsByMonth = $ticketRepository->ticketCreatedByMonthCount();
+        $totalTickets = $ticketRepository->getTotalNumberOfTickets();
 
         // Prepare labels and values for the chart
         $labelsStatusCount = [];
@@ -48,44 +49,14 @@ class DashboardController extends AbstractController
         $form = $this->createForm(TicketFilterType::class);
         $form->handleRequest($request);
 
-        // Default query to retrieve all tickets
-        $queryBuilder = $ticketRepository->createQueryBuilder('t');
+        $tickets = $ticketRepository->filterTickets($form);
 
-        // Filter tickets based on user role
-        if (!$this->isGranted('ROLE_SUPPORT')) {
-            $queryBuilder->andWhere('t.owned_by = :user')
-                ->setParameter('user', $this->getUser());
-        }
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
-
-            // Filter by title
-            if (!empty($data['title'])) {
-                $queryBuilder->andWhere('t.title LIKE :title')
-                    ->setParameter('title', '%' . $data['title'] . '%');
-            }
-
-            // Filter by priority
-            if (!empty($data['priority'])) {
-                $queryBuilder->andWhere('t.priority = :priority')
-                    ->setParameter('priority', $data['priority']);
-            }
-
-            // Filter by status
-            if (!empty($data['status'])) {
-                $queryBuilder->andWhere('t.status = :status')
-                    ->setParameter('status', $data['status']);
-            }
-        }
-
-        // Execute the query and get the results
-        $tickets = $queryBuilder->getQuery()->getResult();
 
         return $this->render('dashboard/index.html.twig', [
             'tickets' => $tickets,
             'form' => $form->createView(),
             'controller_name' => 'DashboardController',
+            'totalTickets' => $totalTickets,
             'chartStatusCountLabels' => $labelsStatusCount,
             'chartStatusCountValues' => $valuesStatusCount,
             'chartExpiredTicketsLabels' => $labelsExpiredTickets,

@@ -1,38 +1,73 @@
 <!DOCTYPE html>
 <html lang="fr">
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Gestion de Tickets{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{% block title %}Gestion de Tickets{% endblock %}</title>
+    <link rel="icon"
+          href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
 
-        <!-- Collapse -->
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Collapse -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-        {% block stylesheets %}
-            {{ encore_entry_link_tags('app') }}
-        {% endblock %}
+    {% block stylesheets %}
+        {{ encore_entry_link_tags('app') }}
+    {% endblock %}
 
-        {% block javascripts %}
-            {{ encore_entry_script_tags('app') }}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-        {% endblock %}
-    </head>
-    {% include 'components/header.html.twig' %}
-    <body class="h-100" style="padding-top: 80px">
-        <div class="container-fluid h-100">
-            <div class="row">
-                <!-- Include the sidebar component -->
-                <div class="col-md-2 p-0 h-100 d-flex">
-                    {% include 'components/sidebar.html.twig' %}
-                </div>
+    <style>
+        .sidebar-toggler {
+            display: block;
+            z-index: 1001;
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: transparent;
+            border: none;
+            padding: 0;
+        }
+        .sidebar-toggler .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(0, 0, 0, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+        }
+    </style>
 
-                <!-- Main content -->
-                <div class="col-md-10 overflow-y-auto p-2" style="height: calc(100vh - 80px)">
-                    {% block body %}{% endblock %}
-                </div>
+    {% block javascripts %}
+        {{ encore_entry_script_tags('app') }}
+        {% block importmap %}{{ importmap('app') }}{% endblock %}
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const sidebar = document.getElementById('sidebar');
+                const sidebarLinks = sidebar.querySelectorAll('.nav-link');
+
+                sidebarLinks.forEach(link => {
+                    link.addEventListener('click', function() {
+                        if (window.innerWidth < 768) {
+                            $(sidebar).collapse('hide');
+                        }
+                    });
+                });
+            });
+        </script>
+    {% endblock %}
+</head>
+{% include 'components/header.html.twig' %}
+<body class="h-100" style="padding-top: 80px">
+<div class="container-fluid h-100">
+    <div class="row">
+        <!-- Include the sidebar component -->
+        <div class="col-12 col-md-2 p-0 h-100 d-flex z-1000">
+
+            <div class="collapse d-md-block h-100 w-100" id="sidebar">
+                {% include 'components/sidebar.html.twig' %}
             </div>
         </div>
-    </body>
+        <!-- Main content -->
+        <div class="col-12 col-md-10 overflow-y-auto p-2" style="height: calc(100vh - 80px)">
+            {% block body %}{% endblock %}
+        </div>
+    </div>
+</div>
+</body>
 </html>

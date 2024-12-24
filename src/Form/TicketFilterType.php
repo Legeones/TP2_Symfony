@@ -9,6 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 
 class TicketFilterType extends AbstractType
 {
@@ -40,7 +41,13 @@ class TicketFilterType extends AbstractType
                     'Closed' => 'closed',
                 ],
                 'placeholder' => 'Select Status',
-            ]);
+            ])
+            ->add('createdat', DateType::class, [
+                'widget' => 'single_text',
+                'required' => false,
+                'label' => 'Filter by date created',
+            ])
+        ;
     }
 
     public function configureOptions(OptionsResolver $resolver)
