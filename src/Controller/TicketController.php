@@ -13,43 +13,21 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 #[IsGranted('ROLE_USER')]
 #[Route('/ticket')]
 final class TicketController extends AbstractController
 {
-    #[Route('/mine', name: 'app_ticket_user', methods: ['GET'])]
-    public function index(Request $request, TicketRepository $ticketRepository): Response
+    #[Route('/mine', name: 'app_ticket_user', methods: ['GET', 'POST'])]
+    public function index(Request $request, TicketRepository $ticketRepository, TokenStorageInterface $tokenStorage): Response
     {
+        $user = $tokenStorage->getToken()->getUser();
         $form = $this->createForm(TicketFilterType::class);
         $form->handleRequest($request);
 
         // Default query to retrieve tickets owned by the user
-        $queryBuilder = $ticketRepository->findTicketByUser($this->getUser());
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
-
-            // Filter by title
-            if (!empty($data['title'])) {
-                $queryBuilder->andWhere('ticket.title LIKE :title')
-                    ->setParameter('title', '%' . $data['title'] . '%');
-            }
-
-            // Filter by priority
-            if (!empty($data['priority'])) {
-                $queryBuilder->andWhere('ticket.priority = :priority')
-                    ->setParameter('priority', $data['priority']);
-            }
-
-            // Filter by status
-            if (!empty($data['status'])) {
-                $queryBuilder->andWhere('ticket.status = :status')
-                    ->setParameter('status', $data['status']);
-            }
-        }
-
-        $tickets = $queryBuilder->getQuery()->getResult();
+        $tickets = $ticketRepository->filterMyTickets($form, $user);
 
         return $this->render('ticket/index.html.twig', [
             'tickets' => $tickets,
@@ -119,7 +97,6 @@ final class TicketController extends AbstractController
         return $this->redirectToRoute('app_dashboard', [], Response::HTTP_SEE_OTHER);
     }
 
-    //Close your ticket
     #[Route('/{id}/close', name: 'app_ticket_close', methods: ['POST'])]
     public function close(Request $request, Ticket $ticket, EntityManagerInterface $entityManager): Response
     {
