@@ -26,6 +26,7 @@
                     <th>Priorite</th>
                     <th>Statut</th>
                     <th>Affecté</th>
+                    <th>Créé par</th>
                     <th>Date_creation</th>
                     <th>Date_maximum_reso</th>
                     <th>Date_resolu</th>
@@ -69,6 +70,7 @@
                                 {% endif %}
                             {% endif %}
                         </td>
+                        <td>{{ ticket.ownedby.email }}</td>
                         <td>{{ ticket.createdat ? ticket.createdat|date('Y-m-d') : '' }}</td>
                         <td>{{ ticket.deadline ? ticket.deadline|date('Y-m-d') : '' }}</td>
                         <td>{{ ticket.resolveAt ? ticket.resolveAt|date('Y-m-d') : '' }}</td>

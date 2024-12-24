@@ -9,17 +9,20 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+
 
 #[IsGranted('ROLE_USER')]
 class DashboardController extends AbstractController
 {
     #[Route('/', name: 'app_dashboard')]
-    public function index(Request $request, TicketRepository $ticketRepository): Response
+    public function index(Request $request, TicketRepository $ticketRepository, TokenStorageInterface $tokenStorage): Response
     {
         $dataStatusCount = $ticketRepository->ticketByStatusCount();
         $dataExpiredTickets = $ticketRepository->ticketByDateOverpassedCount();
         $dataTicketsByMonth = $ticketRepository->ticketCreatedByMonthCount();
         $totalTickets = $ticketRepository->getTotalNumberOfTickets();
+        $user = $tokenStorage->getToken()->getUser();
 
         // Prepare labels and values for the chart
         $labelsStatusCount = [];
@@ -49,8 +52,8 @@ class DashboardController extends AbstractController
         $form = $this->createForm(TicketFilterType::class);
         $form->handleRequest($request);
 
-        $tickets = $ticketRepository->filterTickets($form);
-
+        // Default query to retrieve all tickets
+        $tickets = $this->isGranted('ROLE_SUPPORT') ?  $ticketRepository->filterTickets($form) : $ticketRepository->filterMyTickets($form, $user);
 
         return $this->render('dashboard/index.html.twig', [
             'tickets' => $tickets,

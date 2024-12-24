@@ -119,6 +119,18 @@ final class TicketController extends AbstractController
         return $this->redirectToRoute('app_dashboard', [], Response::HTTP_SEE_OTHER);
     }
 
+    //Close your ticket
+    #[Route('/{id}/close', name: 'app_ticket_close', methods: ['POST'])]
+    public function close(Request $request, Ticket $ticket, EntityManagerInterface $entityManager): Response
+    {
+        if ($this->isCsrfTokenValid('close'.$ticket->getId(), $request->request->get('_token'))) {
+            $ticket->setStatus(Status::Closed);
+            $entityManager->flush();
+        }
+
+        return $this->redirectToRoute('app_dashboard', [], Response::HTTP_SEE_OTHER);
+    }
+
     #[Route('/{id}/assign', name: 'app_ticket_assign', methods: ['POST'])]
     public function assign(Request $request, Ticket $ticket, EntityManagerInterface $entityManager): Response
     {

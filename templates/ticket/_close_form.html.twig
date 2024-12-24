@@ -1,0 +1,4 @@
+<form method="post" action="{{ path('app_ticket_close', {'id': ticket.id}) }}" onsubmit="return confirm('Are you sure you want to close this ticket?');">
+    <input type="hidden" name="_token" value="{{ csrf_token('close' ~ ticket.id) }}">
+    <button class="btn btn-danger m-1">Close this</button>
+</form>

@@ -113,7 +113,7 @@ class TicketRepository extends ServiceEntityRepository
     public function filterMyTickets(Form $form, User $user): array
     {
         $queryBuilder = $this->createQueryBuilder('t')
-            ->where('t.assignedTo = :user')
+            ->where('t.owned_by = :user')
             ->setParameter('user', $user);
 
         if ($form->isSubmitted() && $form->isValid()) {

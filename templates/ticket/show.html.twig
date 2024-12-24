@@ -42,31 +42,38 @@
                     <th>Affecté</th>
                     <td>{{ ticket.assignedTo ? ticket.assignedTo.email : 'Nobody' }}</td>
                 </tr>
-
+                <tr>
+                    <th>Créé par</th>
+                    <td>{{ ticket.ownedby.email }}</td>
+                </tr>
                 </tbody>
             </table>
         </div>
     </div>
-
+    <div class="btn-group" role="group">
     <a class="btn btn-primary m-1" href="{{ path('app_dashboard') }}">back to list</a>
+    {{ include('ticket/_close_form.html.twig') }}
 
     {% if is_granted('ROLE_SUPPORT') %}
-        <div class="btn-group" role="group">
-        {% if ticket.assignedTo != null and ticket.assignedTo.email == app.user.email %}
+            {% if ticket.assignedTo != null and ticket.assignedTo.email == app.user.email %}
                 <a class="btn btn-primary" href="{{ path('app_ticket_edit', {'id': ticket.id}) }}">edit</a>
                 <form action="{{ path('app_ticket_resolve', {'id': ticket.id}) }}" method="post" class="d-inline">
-                <input type="hidden" name="_token" value="{{ csrf_token('resolve' ~ ticket.id) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('resolve' ~ ticket.id) }}">
                     <button class="btn btn-primary" type="submit">Resolve</button>
-            </form>
-        {% endif %}
-        {% if ticket.assignedTo is null %}
+                </form>
+            {% endif %}
+            {% if ticket.assignedTo is null %}
                 <form action="{{ path('app_ticket_assign', {'id': ticket.id}) }}" method="post" class="d-inline">
-                <input type="hidden" name="_token" value="{{ csrf_token('assign' ~ ticket.id) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('assign' ~ ticket.id) }}">
                     <button class="btn btn-primary" type="submit">Assign</button>
-            </form>
-        {% endif %}
-        </div>
+                </form>
+            {% endif %}
+
+
     {% endif %}
-    
-    {{ include('ticket/_delete_form.html.twig') }}
+    {% if is_granted('ROLE_ADMIN') %}
+        {{ include('ticket/_delete_form.html.twig') }}
+    {% endif %}
+    </div>
+
 {% endblock %}
